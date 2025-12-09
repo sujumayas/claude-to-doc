@@ -13,7 +13,27 @@ A chat-based application that uses Claude AI to help you create compelling RPG s
   - CSV (.csv)
 - **Iterative Workflow**: Discuss, refine, and iterate on your RPG content
 
-## Getting Started
+## Deploy to Netlify
+
+### One-Click Deploy
+
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/YOUR_USERNAME/claude-to-doc)
+
+### Manual Deployment
+
+1. Push this repository to GitHub
+2. Log in to [Netlify](https://app.netlify.com)
+3. Click "Add new site" > "Import an existing project"
+4. Connect your GitHub repository
+5. Configure build settings (auto-detected from `netlify.toml`):
+   - Build command: `npm run build`
+   - Publish directory: `.next`
+6. Add environment variable:
+   - Go to **Site settings** > **Environment variables**
+   - Add `ANTHROPIC_API_KEY` with your API key value
+7. Deploy!
+
+## Local Development
 
 ### Prerequisites
 
@@ -75,6 +95,12 @@ src/
 └── types/
     └── index.ts      # TypeScript type definitions
 ```
+
+## Environment Variables
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `ANTHROPIC_API_KEY` | Your Anthropic API key | Yes |
 
 ## Tech Stack
 
