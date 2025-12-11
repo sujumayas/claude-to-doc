@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Sidebar from "@/components/Sidebar";
 
 export const metadata: Metadata = {
-  title: "RPG Story Generator",
-  description: "Create compelling RPG stories, campaigns, and world-building content with Claude AI",
+  title: "RPG Toolkit",
+  description: "Create compelling RPG stories and maps with AI",
 };
 
 export default function RootLayout({
@@ -14,7 +15,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans antialiased">
-        {children}
+        <div className="flex h-screen">
+          <Sidebar />
+          <main className="flex-1 overflow-hidden">
+            {children}
+          </main>
+        </div>
       </body>
     </html>
   );

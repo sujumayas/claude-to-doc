@@ -29,3 +29,30 @@ export interface ExportOptions {
   content: string;
   filename: string;
 }
+
+// Map Generator Types
+export type MapType = 'world' | 'town' | 'dungeon';
+
+export interface MapLocation {
+  id: string;
+  name: string;
+}
+
+export interface GeneratedMap {
+  id: string;
+  mapType: MapType;
+  prompt: string;
+  locations: string[];
+  imageBase64: string;
+  legend: { number: number; name: string }[];
+  description?: string;
+  createdAt: Date;
+}
+
+export interface MapGeneratorState {
+  selectedType: MapType;
+  prompt: string;
+  locations: string[];
+  isGenerating: boolean;
+  generatedMaps: GeneratedMap[];
+}

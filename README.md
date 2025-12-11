@@ -1,23 +1,26 @@
-# RPG Story Generator
+# RPG Toolkit
 
-A chat-based application that uses Claude AI to help you create compelling RPG storylines, campaigns, characters, and world-building content.
+A comprehensive AI-powered toolkit for RPG game masters and storytellers. Create compelling storylines with Claude AI and generate custom maps with Gemini AI.
 
 ## Features
 
-- **Chat Interface**: Conversational interaction with Claude AI optimized for RPG content creation
-- **Context Upload**: Upload reference documents (.txt, .md, .json, .csv) to provide context for your stories
-- **Multi-Format Export**: Export your content in various formats:
-  - Text (.txt)
-  - Word Document (.docx)
-  - PDF (.pdf)
-  - CSV (.csv)
+### Story Generator (Claude AI)
+- **Chat Interface**: Conversational interaction optimized for RPG content creation
+- **Context Upload**: Upload reference documents (.txt, .md, .json, .csv) to provide context
+- **Multi-Format Export**: Export content as Text, Word (.docx), PDF, or CSV
 - **Iterative Workflow**: Discuss, refine, and iterate on your RPG content
 
+### Map Generator (Gemini AI)
+- **Three Map Types**:
+  - **World Maps**: Regional maps with cities, terrain, and points of interest
+  - **Town Maps**: Detailed settlement maps with buildings and streets
+  - **Dungeon Maps**: Gridded battle maps for encounters and exploration
+- **Custom Locations**: Add specific locations that will be placed logically on the map
+- **Auto-Generated Legends**: Numbered legends based on your specified locations
+- **Map History**: Generated maps are saved to localStorage for easy access
+- **Download**: Export maps as PNG files
+
 ## Deploy to Netlify
-
-### One-Click Deploy
-
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/YOUR_USERNAME/claude-to-doc)
 
 ### Manual Deployment
 
@@ -28,17 +31,19 @@ A chat-based application that uses Claude AI to help you create compelling RPG s
 5. Configure build settings (auto-detected from `netlify.toml`):
    - Build command: `npm run build`
    - Publish directory: `.next`
-6. Add environment variable:
+6. Add environment variables:
    - Go to **Site settings** > **Environment variables**
-   - Add `ANTHROPIC_API_KEY` with your API key value
+   - Add `ANTHROPIC_API_KEY` with your Anthropic API key
+   - Add `GEMINI_API_KEY` with your Google Gemini API key
 7. Deploy!
 
 ## Local Development
 
 ### Prerequisites
 
-- Node.js 18+
-- An Anthropic API key
+- Node.js 20+
+- An Anthropic API key (for Story Generator)
+- A Google Gemini API key (for Map Generator)
 
 ### Installation
 
@@ -53,10 +58,10 @@ cd claude-to-doc
 npm install
 ```
 
-3. Create a `.env.local` file with your Anthropic API key:
+3. Create a `.env.local` file with your API keys:
 ```bash
 cp .env.example .env.local
-# Edit .env.local and add your API key
+# Edit .env.local and add your API keys
 ```
 
 4. Start the development server:
@@ -66,41 +71,58 @@ npm run dev
 
 5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Usage Workflow
+## Usage
 
-1. **Upload Context** (Optional): Add reference documents like world lore, existing character sheets, or campaign notes
-2. **Describe Your Needs**: Tell Claude about the RPG content you want to create
-3. **Discuss & Refine**: Have a conversation to explore different approaches and ideas
-4. **Select Output Format**: Choose your preferred export format (Text, Word, PDF, or CSV)
-5. **Generate Final Draft**: Ask Claude to produce the final version
-6. **Export & Iterate**: Export your content and continue refining as needed
+### Story Generator
+1. Navigate to **Story Chat** in the sidebar
+2. Upload context documents (optional)
+3. Describe your RPG content needs
+4. Discuss and refine with Claude
+5. Select output format and export
+
+### Map Generator
+1. Navigate to **Map Generator** in the sidebar
+2. Select a map type (World, Town, or Dungeon)
+3. Describe your map in detail
+4. Add key locations that should appear on the map
+5. Click **Generate Map**
+6. Download or view from history
 
 ## Project Structure
 
 ```
 src/
 ├── app/
-│   ├── api/chat/     # Claude API endpoint
-│   ├── layout.tsx    # App layout
-│   └── page.tsx      # Main chat page
+│   ├── api/
+│   │   ├── chat/           # Claude API endpoint
+│   │   └── generate-map/   # Gemini API endpoint
+│   ├── map-generator/      # Map generator page
+│   ├── layout.tsx          # App layout with sidebar
+│   └── page.tsx            # Story chat page
 ├── components/
-│   ├── ChatInput.tsx     # Message input component
-│   ├── ExportPanel.tsx   # Export format selection
-│   ├── FileUpload.tsx    # Document upload component
-│   └── MessageList.tsx   # Chat message display
+│   ├── ChatInput.tsx       # Message input
+│   ├── ExportPanel.tsx     # Export format selection
+│   ├── FileUpload.tsx      # Document upload
+│   ├── LocationInput.tsx   # Map location input
+│   ├── MapHistory.tsx      # Saved maps display
+│   ├── MapTypeSelector.tsx # Map type selection
+│   ├── MessageList.tsx     # Chat messages
+│   └── Sidebar.tsx         # Navigation sidebar
 ├── lib/
-│   ├── exporters.ts          # Document export utilities
-│   ├── rpg-system-prompt.ts  # RPG-optimized system prompt
-│   └── utils.ts              # Helper functions
+│   ├── exporters.ts        # Document export utilities
+│   ├── map-storage.ts      # LocalStorage for maps
+│   ├── rpg-system-prompt.ts # Story system prompt
+│   └── utils.ts            # Helper functions
 └── types/
-    └── index.ts      # TypeScript type definitions
+    └── index.ts            # TypeScript definitions
 ```
 
 ## Environment Variables
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `ANTHROPIC_API_KEY` | Your Anthropic API key | Yes |
+| Variable | Description | Required For |
+|----------|-------------|--------------|
+| `ANTHROPIC_API_KEY` | Anthropic API key | Story Generator |
+| `GEMINI_API_KEY` | Google Gemini API key | Map Generator |
 
 ## Tech Stack
 
@@ -108,6 +130,7 @@ src/
 - **TypeScript** - Type safety
 - **Tailwind CSS** - Styling
 - **Anthropic SDK** - Claude AI integration
+- **Google Gemini API** - Map image generation
 - **docx** - Word document generation
 - **jsPDF** - PDF generation
 - **file-saver** - File download handling

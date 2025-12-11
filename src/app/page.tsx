@@ -74,7 +74,7 @@ export default function Home() {
       const errorMessage: Message = {
         id: generateId(),
         role: 'assistant',
-        content: 'Sorry, there was an error processing your request. Please make sure your ANTHROPIC_API_KEY is configured in .env.local',
+        content: 'Sorry, there was an error processing your request. Please make sure your ANTHROPIC_API_KEY is configured.',
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);
@@ -88,12 +88,12 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <div className="flex flex-col h-full bg-gray-50">
       {/* Header */}
       <header className="bg-indigo-600 text-white p-4 shadow-lg">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">RPG Story Generator</h1>
+            <h1 className="text-2xl font-bold">Story Generator</h1>
             <p className="text-indigo-200 text-sm">Powered by Claude AI</p>
           </div>
           <button
@@ -106,7 +106,7 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col max-w-6xl mx-auto w-full bg-white shadow-xl overflow-hidden">
+      <div className="flex-1 flex flex-col bg-white shadow-xl overflow-hidden">
         {/* File Upload Section */}
         <FileUpload files={uploadedFiles} onFilesChange={setUploadedFiles} />
 
@@ -124,11 +124,6 @@ export default function Home() {
         {/* Chat Input */}
         <ChatInput onSend={handleSend} disabled={isLoading} />
       </div>
-
-      {/* Footer */}
-      <footer className="bg-gray-100 text-center py-2 text-xs text-gray-500">
-        Upload context docs → Chat about your RPG ideas → Export in your preferred format
-      </footer>
     </div>
   );
 }
