@@ -9,7 +9,8 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# Explicitly handle API routes
+# Functions configuration - let esbuild handle bundling with tree-shaking
 [functions]
   node_bundler = "esbuild"
-  included_files = ["node_modules/**"]
+  # Don't include all node_modules - esbuild will bundle only what's needed
+  # This prevents the 250MB+ bundle size issue
