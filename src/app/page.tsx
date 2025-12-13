@@ -88,17 +88,17 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-50">
+    <div className="flex flex-col h-full min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-indigo-600 text-white p-4 shadow-lg">
-        <div className="flex items-center justify-between">
+      <header className="bg-indigo-600 text-white p-3 sm:p-4 shadow-lg">
+        <div className="flex items-center justify-between pl-10 lg:pl-0">
           <div>
-            <h1 className="text-2xl font-bold">Story Generator</h1>
-            <p className="text-indigo-200 text-sm">Powered by Claude AI</p>
+            <h1 className="text-xl sm:text-2xl font-bold">Story Generator</h1>
+            <p className="text-indigo-200 text-xs sm:text-sm">Powered by Claude AI</p>
           </div>
           <button
             onClick={handleClearChat}
-            className="px-4 py-2 bg-indigo-500 hover:bg-indigo-400 rounded-lg text-sm transition-colors"
+            className="px-3 sm:px-4 py-1.5 sm:py-2 bg-indigo-500 hover:bg-indigo-400 rounded-lg text-sm transition-colors"
           >
             New Chat
           </button>

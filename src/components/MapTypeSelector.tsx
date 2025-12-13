@@ -39,17 +39,17 @@ export default function MapTypeSelector({ selected, onSelect }: MapTypeSelectorP
           <button
             key={type.value}
             onClick={() => onSelect(type.value)}
-            className={`w-full p-3 rounded-lg border-2 text-left transition-all ${
+            className={`w-full p-2 sm:p-3 rounded-lg border-2 text-left transition-all ${
               selected === type.value
                 ? 'border-emerald-500 bg-emerald-50'
                 : 'border-gray-200 hover:border-gray-300 bg-white'
             }`}
           >
-            <div className="flex items-center space-x-3">
-              <span className="text-2xl">{type.icon}</span>
-              <div>
-                <div className="font-medium text-gray-900">{type.label}</div>
-                <div className="text-xs text-gray-500">{type.description}</div>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <span className="text-xl sm:text-2xl">{type.icon}</span>
+              <div className="min-w-0">
+                <div className="font-medium text-gray-900 text-sm sm:text-base">{type.label}</div>
+                <div className="text-xs text-gray-500 truncate sm:whitespace-normal">{type.description}</div>
               </div>
             </div>
           </button>

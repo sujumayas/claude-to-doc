@@ -15,9 +15,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans antialiased">
-        <div className="flex h-screen">
+        <div className="flex min-h-screen">
           <Sidebar />
-          <main className="flex-1 overflow-hidden">
+          <main className="flex-1 overflow-hidden lg:ml-0 w-full">
             {children}
           </main>
         </div>

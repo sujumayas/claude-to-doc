@@ -16,6 +16,7 @@ export default function MapGeneratorPage() {
   const [currentMap, setCurrentMap] = useState<GeneratedMap | null>(null);
   const [savedMaps, setSavedMaps] = useState<GeneratedMap[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [showControls, setShowControls] = useState(true);
 
   useEffect(() => {
     setSavedMaps(getMapsFromStorage());
@@ -61,6 +62,10 @@ export default function MapGeneratorPage() {
       setCurrentMap(newMap);
       saveMapToStorage(newMap);
       setSavedMaps(getMapsFromStorage());
+      // On mobile, switch to map view after generating
+      if (window.innerWidth < 1024) {
+        setShowControls(false);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate map');
     } finally {
@@ -78,23 +83,39 @@ export default function MapGeneratorPage() {
 
   const handleSelectMap = (map: GeneratedMap) => {
     setCurrentMap(map);
+    // On mobile, switch to map view when selecting a map
+    if (window.innerWidth < 1024) {
+      setShowControls(false);
+    }
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full min-h-screen">
       {/* Header */}
-      <header className="bg-emerald-600 text-white p-4 shadow-lg">
-        <div className="flex items-center justify-between">
+      <header className="bg-emerald-600 text-white p-3 sm:p-4 shadow-lg">
+        <div className="flex items-center justify-between pl-10 lg:pl-0">
           <div>
-            <h1 className="text-2xl font-bold">Map Generator</h1>
-            <p className="text-emerald-200 text-sm">Powered by Gemini AI</p>
+            <h1 className="text-xl sm:text-2xl font-bold">Map Generator</h1>
+            <p className="text-emerald-200 text-xs sm:text-sm">Powered by Gemini AI</p>
           </div>
+          {/* Mobile toggle button */}
+          <button
+            onClick={() => setShowControls(!showControls)}
+            className="lg:hidden px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 rounded-lg text-sm transition-colors"
+          >
+            {showControls ? 'View Map' : 'Controls'}
+          </button>
         </div>
       </header>
 
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         {/* Left Panel - Controls */}
-        <div className="w-96 bg-white border-r overflow-y-auto p-4 space-y-6">
+        <div className={`
+          ${showControls ? 'flex' : 'hidden'} lg:flex
+          w-full lg:w-96 bg-white border-b lg:border-b-0 lg:border-r
+          overflow-y-auto p-4 space-y-6 flex-col
+          ${!currentMap ? 'flex-1 lg:flex-none' : ''}
+        `}>
           {/* Map Type Selector */}
           <MapTypeSelector selected={selectedType} onSelect={setSelectedType} />
 
@@ -107,7 +128,7 @@ export default function MapGeneratorPage() {
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="Describe your map in detail... e.g., 'A coastal kingdom with a major port city, surrounded by mountains to the north and forests to the east'"
-              className="w-full h-32 border rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full h-28 sm:h-32 border rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
 
@@ -149,16 +170,19 @@ export default function MapGeneratorPage() {
         </div>
 
         {/* Right Panel - Map Preview */}
-        <div className="flex-1 bg-gray-100 p-6 overflow-y-auto">
+        <div className={`
+          ${showControls ? 'hidden' : 'flex'} lg:flex
+          flex-1 bg-gray-100 p-4 sm:p-6 overflow-y-auto flex-col
+        `}>
           {currentMap ? (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-800">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-800">
                   {currentMap.mapType.charAt(0).toUpperCase() + currentMap.mapType.slice(1)} Map
                 </h2>
                 <button
                   onClick={() => downloadMap(currentMap)}
-                  className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm hover:bg-emerald-700 transition-colors"
+                  className="px-3 sm:px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm hover:bg-emerald-700 transition-colors"
                 >
                   Download PNG
                 </button>
@@ -177,10 +201,10 @@ export default function MapGeneratorPage() {
               {currentMap.legend.length > 0 && (
                 <div className="bg-white rounded-lg shadow p-4">
                   <h3 className="font-medium text-gray-800 mb-3">Map Legend</h3>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {currentMap.legend.map((item) => (
                       <div key={item.number} className="flex items-center space-x-2 text-sm">
-                        <span className="w-6 h-6 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center font-medium">
+                        <span className="w-6 h-6 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center font-medium flex-shrink-0">
                           {item.number}
                         </span>
                         <span className="text-gray-700">{item.name}</span>
@@ -199,12 +223,12 @@ export default function MapGeneratorPage() {
               )}
             </div>
           ) : (
-            <div className="h-full flex items-center justify-center">
-              <div className="text-center text-gray-500">
-                <svg className="w-24 h-24 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="h-full flex items-center justify-center flex-1">
+              <div className="text-center text-gray-500 px-4">
+                <svg className="w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                 </svg>
-                <h3 className="text-lg font-medium mb-2">No Map Generated Yet</h3>
+                <h3 className="text-base sm:text-lg font-medium mb-2">No Map Generated Yet</h3>
                 <p className="text-sm">Select a map type, describe your map, and click Generate</p>
               </div>
             </div>
