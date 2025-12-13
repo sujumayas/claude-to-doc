@@ -23,9 +23,9 @@ export async function POST(request: NextRequest) {
 
     const fullPrompt = `${styleGuide}\n\nMap Description: ${prompt}${locationsList}\n\nCreate a detailed, high-quality RPG map image. Ensure all specified locations are clearly visible and logically positioned. The map should be suitable for tabletop roleplaying games.`;
 
-    // Call Gemini API
+    // Call Gemini API with the correct image generation model
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         method: 'POST',
         headers: {
