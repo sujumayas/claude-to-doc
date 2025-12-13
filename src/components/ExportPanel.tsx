@@ -59,16 +59,17 @@ export default function ExportPanel({ messages, outputFormat, onFormatChange }: 
   ];
 
   return (
-    <div className="border-b bg-white p-4">
-      <div className="flex items-center justify-between flex-wrap gap-4">
-        <div className="flex items-center space-x-4">
+    <div className="border-b bg-white p-3 sm:p-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+        {/* Format selection */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
           <span className="text-sm font-medium text-gray-700">Output Format:</span>
-          <div className="flex space-x-1">
+          <div className="flex flex-wrap gap-1">
             {formats.map((format) => (
               <button
                 key={format.value}
                 onClick={() => onFormatChange(format.value)}
-                className={`px-3 py-1 text-sm rounded transition-colors ${
+                className={`px-2 sm:px-3 py-1 text-xs sm:text-sm rounded transition-colors ${
                   outputFormat === format.value
                     ? 'bg-indigo-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -80,11 +81,12 @@ export default function ExportPanel({ messages, outputFormat, onFormatChange }: 
           </div>
         </div>
 
-        <div className="flex items-center space-x-4">
+        {/* Export controls */}
+        <div className="flex items-center gap-2 sm:gap-4">
           <select
             value={exportMode}
             onChange={(e) => setExportMode(e.target.value as 'last' | 'all')}
-            className="text-sm border rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="text-sm border rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 flex-1 sm:flex-none"
           >
             <option value="last">Last Response</option>
             <option value="all">Full Conversation</option>
@@ -93,7 +95,7 @@ export default function ExportPanel({ messages, outputFormat, onFormatChange }: 
           <button
             onClick={handleExport}
             disabled={isExporting || messages.length === 0}
-            className="px-4 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+            className="px-3 sm:px-4 py-1.5 sm:py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center gap-2 whitespace-nowrap"
           >
             {isExporting ? (
               <>
@@ -101,12 +103,10 @@ export default function ExportPanel({ messages, outputFormat, onFormatChange }: 
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                 </svg>
-                <span>Exporting...</span>
+                <span className="hidden sm:inline">Exporting...</span>
               </>
             ) : (
-              <>
-                <span>Export</span>
-              </>
+              <span>Export</span>
             )}
           </button>
         </div>

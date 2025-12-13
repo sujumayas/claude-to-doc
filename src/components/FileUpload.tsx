@@ -46,12 +46,12 @@ export default function FileUpload({ files, onFilesChange }: FileUploadProps) {
   };
 
   return (
-    <div className="border-b bg-gray-50 p-4">
+    <div className="border-b bg-gray-50 p-3 sm:p-4">
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-sm font-medium text-gray-700">Context Documents</h3>
         <button
           onClick={() => fileInputRef.current?.click()}
-          className="text-sm px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+          className="text-xs sm:text-sm px-2 sm:px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
         >
           + Add Files
         </button>
@@ -70,9 +70,9 @@ export default function FileUpload({ files, onFilesChange }: FileUploadProps) {
           {files.map((file) => (
             <div
               key={file.id}
-              className="flex items-center space-x-2 bg-white border rounded px-3 py-1 text-sm"
+              className="flex items-center gap-2 bg-white border rounded px-2 sm:px-3 py-1 text-xs sm:text-sm"
             >
-              <span className="text-gray-600 truncate max-w-[150px]">{file.name}</span>
+              <span className="text-gray-600 truncate max-w-[100px] sm:max-w-[150px]">{file.name}</span>
               <button
                 onClick={() => removeFile(file.id)}
                 className="text-gray-400 hover:text-red-500"
