@@ -23,13 +23,14 @@ export async function POST(request: NextRequest) {
 
     const fullPrompt = `${styleGuide}\n\nMap Description: ${prompt}${locationsList}\n\nCreate a detailed, high-quality RPG map image. Ensure all specified locations are clearly visible and logically positioned. The map should be suitable for tabletop roleplaying games.`;
 
-    // Call Gemini API with the correct image generation model
+    // Call Gemini API with the Nano Banana Pro model (gemini-3-pro-image-preview)
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent`,
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-goog-api-key': process.env.GEMINI_API_KEY as string,
         },
         body: JSON.stringify({
           contents: [
