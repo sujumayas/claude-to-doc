@@ -1,4 +1,4 @@
-import Anthropic from '@anthropic-ai/sdk';
+import Anthropic, { APIError } from '@anthropic-ai/sdk';
 import { NextRequest, NextResponse } from 'next/server';
 import { getPuzzleSystemPrompt } from '@/lib/puzzle-system-prompt';
 import { PuzzleGenre, PuzzleCategory, PuzzleDifficulty } from '@/types';
@@ -10,6 +10,9 @@ export const dynamic = 'force-dynamic';
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
+
+const anthropicModel =
+  process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20241022';
 
 interface PuzzleResponse {
   title: string;
@@ -51,20 +54,51 @@ export async function POST(request: NextRequest) {
       ? `Create a puzzle based on this concept: ${prompt}`
       : `Create an engaging ${difficulty} ${category} puzzle for a ${genre} RPG setting. Be creative and original with the theme and setting.`;
 
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-5-20250929',
-      max_tokens: 4096,
-      system: systemPrompt,
-      messages: [
-        {
-          role: 'user',
-          content: userMessage,
-        },
-      ],
-    });
+    let assistantMessage = '';
+    let responseUsage;
 
-    const assistantMessage =
-      response.content[0].type === 'text' ? response.content[0].text : '';
+    try {
+      const response = await anthropic.messages.create({
+        model: anthropicModel,
+        max_tokens: 4096,
+        system: systemPrompt,
+        messages: [
+          {
+            role: 'user',
+            content: userMessage,
+          },
+        ],
+      });
+
+      const textContent = response.content.find(
+        (content): content is { type: 'text'; text: string } =>
+          content.type === 'text'
+      );
+
+      if (!textContent) {
+        return NextResponse.json(
+          { error: 'Invalid response format from puzzle generator' },
+          { status: 502 }
+        );
+      }
+
+      assistantMessage = textContent.text;
+      responseUsage = response.usage;
+    } catch (apiError) {
+      console.error('Anthropic API error during puzzle generation:', apiError);
+
+      if (apiError instanceof APIError) {
+        return NextResponse.json(
+          { error: apiError.message },
+          { status: apiError.status || 500 }
+        );
+      }
+
+      return NextResponse.json(
+        { error: 'Unexpected error contacting puzzle generation service' },
+        { status: 500 }
+      );
+    }
 
     // Parse the JSON response
     let puzzleData: PuzzleResponse;
@@ -95,7 +129,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       ...puzzleData,
       fullMarkdown,
-      usage: response.usage,
+      usage: responseUsage,
     });
   } catch (error) {
     console.error('Puzzle generation error:', error);
