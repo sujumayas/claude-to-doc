@@ -72,6 +72,7 @@ export type PuzzleDifficulty = 'easy' | 'medium' | 'hard';
 export interface PuzzleImage {
   id: string;
   imageBase64: string;
+  mimeType: string;
   caption: string;
 }
 

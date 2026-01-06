@@ -8,6 +8,7 @@ export const dynamic = 'force-dynamic';
 
 interface GeneratedImage {
   imageBase64: string;
+  mimeType: string;
   caption: string;
 }
 
@@ -70,11 +71,13 @@ export async function POST(request: NextRequest) {
 
         // Extract image from response
         let imageBase64 = null;
+        let mimeType = 'image/png'; // Default fallback
 
         if (data.candidates && data.candidates[0]?.content?.parts) {
           for (const part of data.candidates[0].content.parts) {
             if (part.inlineData?.data) {
               imageBase64 = part.inlineData.data;
+              mimeType = part.inlineData.mimeType || 'image/png';
               break;
             }
           }
@@ -83,6 +86,7 @@ export async function POST(request: NextRequest) {
         if (imageBase64) {
           generatedImages.push({
             imageBase64,
+            mimeType,
             caption: promptText,
           });
         }

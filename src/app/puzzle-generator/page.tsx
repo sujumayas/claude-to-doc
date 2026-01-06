@@ -78,9 +78,10 @@ export default function PuzzleGeneratorPage() {
         if (imageResponse.ok) {
           const imageData = await imageResponse.json();
           images = (imageData.images || []).map(
-            (img: { imageBase64: string; caption: string }, index: number) => ({
+            (img: { imageBase64: string; mimeType: string; caption: string }, index: number) => ({
               id: generateId(),
               imageBase64: img.imageBase64,
+              mimeType: img.mimeType || 'image/png',
               caption: img.caption,
             })
           );
@@ -319,11 +320,11 @@ export default function PuzzleGeneratorPage() {
                     {currentPuzzle.images.map((image, index) => (
                       <div key={image.id} className="relative group">
                         <img
-                          src={`data:image/png;base64,${image.imageBase64}`}
+                          src={`data:${image.mimeType || 'image/png'};base64,${image.imageBase64}`}
                           alt={image.caption}
                           className="w-full h-40 object-cover rounded-lg"
                         />
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all rounded-lg flex items-center justify-center">
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all rounded-lg flex items-center justify-center">
                           <button
                             onClick={() => downloadPuzzleImage(currentPuzzle, index)}
                             className="opacity-0 group-hover:opacity-100 px-3 py-1.5 bg-white text-gray-800 rounded-lg text-sm transition-opacity"

@@ -56,9 +56,12 @@ export const downloadPuzzleImage = (puzzle: GeneratedPuzzle, imageIndex: number)
   const image = puzzle.images[imageIndex];
   if (!image) return;
 
+  const mimeType = image.mimeType || 'image/png';
+  const extension = mimeType.split('/')[1] || 'png';
+
   const link = document.createElement('a');
-  link.href = `data:image/png;base64,${image.imageBase64}`;
-  link.download = `${puzzle.genre}-puzzle-${puzzle.id}-image-${imageIndex + 1}.png`;
+  link.href = `data:${mimeType};base64,${image.imageBase64}`;
+  link.download = `${puzzle.genre}-puzzle-${puzzle.id}-image-${imageIndex + 1}.${extension}`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
