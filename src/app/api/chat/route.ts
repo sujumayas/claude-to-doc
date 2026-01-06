@@ -9,6 +9,9 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
+const DEFAULT_ANTHROPIC_MODEL = 'claude-3-5-sonnet-latest';
+const anthropicModel = process.env.ANTHROPIC_MODEL || DEFAULT_ANTHROPIC_MODEL;
+
 export async function POST(request: NextRequest) {
   try {
     const { messages, systemPrompt } = await request.json();
@@ -21,7 +24,7 @@ export async function POST(request: NextRequest) {
     }
 
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-5-20250929',
+      model: anthropicModel,
       max_tokens: 8192,
       system: systemPrompt,
       messages: messages.map((msg: { role: string; content: string }) => ({
