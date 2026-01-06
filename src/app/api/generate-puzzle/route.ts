@@ -12,8 +12,10 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
+const DEFAULT_ANTHROPIC_MODEL = 'claude-3-5-sonnet-latest';
+
 const anthropicModel =
-  process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20241022';
+  process.env.ANTHROPIC_MODEL || DEFAULT_ANTHROPIC_MODEL;
 
 interface PuzzleResponse {
   title: string;
@@ -88,6 +90,21 @@ export async function POST(request: NextRequest) {
       console.error('Anthropic API error during puzzle generation:', apiError);
 
       if (apiError instanceof APIError) {
+        const modelNotFound =
+          apiError.status === 404 ||
+          (typeof apiError.error === 'object' &&
+            apiError.error?.type === 'not_found_error');
+
+        if (modelNotFound) {
+          return NextResponse.json(
+            {
+              error:
+                'Configured Anthropic model was not found. Update ANTHROPIC_MODEL to a valid model (e.g., claude-3-5-sonnet-latest).',
+            },
+            { status: 400 }
+          );
+        }
+
         return NextResponse.json(
           { error: apiError.message },
           { status: apiError.status || 500 }
