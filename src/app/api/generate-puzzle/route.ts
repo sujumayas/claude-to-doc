@@ -1,13 +1,15 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getPuzzleSystemPrompt } from '@/lib/puzzle-system-prompt';
 import { PuzzleGenre, PuzzleCategory, PuzzleDifficulty } from '@/types';
 
 // Force Node.js runtime for Netlify compatibility
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-// Extend max duration for serverless function
-export const maxDuration = 60;
+
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+});
 
 interface PuzzleResponse {
   title: string;
@@ -25,23 +27,19 @@ export async function POST(request: NextRequest) {
     const { genre, category, difficulty, prompt } = await request.json();
 
     if (!process.env.ANTHROPIC_API_KEY) {
-      return new Response(
-        JSON.stringify({ error: 'ANTHROPIC_API_KEY not configured' }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      return NextResponse.json(
+        { error: 'ANTHROPIC_API_KEY not configured' },
+        { status: 500 }
       );
     }
 
     // Validate inputs
     if (!genre || !category || !difficulty) {
-      return new Response(
-        JSON.stringify({ error: 'Missing required fields: genre, category, difficulty' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      return NextResponse.json(
+        { error: 'Missing required fields: genre, category, difficulty' },
+        { status: 400 }
       );
     }
-
-    const anthropic = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
-    });
 
     const systemPrompt = getPuzzleSystemPrompt(
       genre as PuzzleGenre,
@@ -53,102 +51,57 @@ export async function POST(request: NextRequest) {
       ? `Create a puzzle based on this concept: ${prompt}`
       : `Create an engaging ${difficulty} ${category} puzzle for a ${genre} RPG setting. Be creative and original with the theme and setting.`;
 
-    // Create a streaming response to keep the connection alive
-    const encoder = new TextEncoder();
-
-    const stream = new ReadableStream({
-      async start(controller) {
-        try {
-          // Send initial keepalive
-          controller.enqueue(encoder.encode(''));
-
-          // Use streaming API
-          const anthropicStream = anthropic.messages.stream({
-            model: 'claude-sonnet-4-5-20250929',
-            max_tokens: 4096,
-            system: systemPrompt,
-            messages: [
-              {
-                role: 'user',
-                content: userMessage,
-              },
-            ],
-          });
-
-          // Collect the streamed response
-          let fullText = '';
-          for await (const event of anthropicStream) {
-            if (
-              event.type === 'content_block_delta' &&
-              event.delta.type === 'text_delta'
-            ) {
-              fullText += event.delta.text;
-            }
-          }
-
-          // Get final message for usage stats
-          const finalMessage = await anthropicStream.finalMessage();
-
-          // Parse the JSON response
-          let puzzleData: PuzzleResponse;
-          try {
-            // Remove any markdown code blocks if present
-            const cleanedResponse = fullText
-              .replace(/```json\n?/g, '')
-              .replace(/```\n?/g, '')
-              .trim();
-            puzzleData = JSON.parse(cleanedResponse);
-          } catch (parseError) {
-            console.error('Failed to parse puzzle response:', parseError);
-            console.error('Raw response:', fullText);
-            const errorResponse = JSON.stringify({
-              error: 'Failed to parse puzzle data from AI response'
-            });
-            controller.enqueue(encoder.encode(errorResponse));
-            controller.close();
-            return;
-          }
-
-          // Generate full markdown content
-          const fullMarkdown = generatePuzzleMarkdown(
-            puzzleData,
-            genre,
-            category,
-            difficulty
-          );
-
-          // Send the final result
-          const result = JSON.stringify({
-            ...puzzleData,
-            fullMarkdown,
-            usage: finalMessage.usage,
-          });
-
-          controller.enqueue(encoder.encode(result));
-          controller.close();
-        } catch (error) {
-          console.error('Streaming error:', error);
-          const errorResponse = JSON.stringify({
-            error: 'Failed to generate puzzle'
-          });
-          controller.enqueue(encoder.encode(errorResponse));
-          controller.close();
-        }
-      },
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-5-20250929',
+      max_tokens: 4096,
+      system: systemPrompt,
+      messages: [
+        {
+          role: 'user',
+          content: userMessage,
+        },
+      ],
     });
 
-    return new Response(stream, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-      },
+    const assistantMessage =
+      response.content[0].type === 'text' ? response.content[0].text : '';
+
+    // Parse the JSON response
+    let puzzleData: PuzzleResponse;
+    try {
+      // Remove any markdown code blocks if present
+      const cleanedResponse = assistantMessage
+        .replace(/```json\n?/g, '')
+        .replace(/```\n?/g, '')
+        .trim();
+      puzzleData = JSON.parse(cleanedResponse);
+    } catch (parseError) {
+      console.error('Failed to parse puzzle response:', parseError);
+      console.error('Raw response:', assistantMessage);
+      return NextResponse.json(
+        { error: 'Failed to parse puzzle data from AI response' },
+        { status: 500 }
+      );
+    }
+
+    // Generate full markdown content
+    const fullMarkdown = generatePuzzleMarkdown(
+      puzzleData,
+      genre,
+      category,
+      difficulty
+    );
+
+    return NextResponse.json({
+      ...puzzleData,
+      fullMarkdown,
+      usage: response.usage,
     });
   } catch (error) {
     console.error('Puzzle generation error:', error);
-    return new Response(
-      JSON.stringify({ error: 'Failed to generate puzzle' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    return NextResponse.json(
+      { error: 'Failed to generate puzzle' },
+      { status: 500 }
     );
   }
 }
