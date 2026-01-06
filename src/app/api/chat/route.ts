@@ -9,8 +9,11 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-const DEFAULT_ANTHROPIC_MODEL = 'claude-3-5-sonnet-latest';
-const anthropicModel = process.env.ANTHROPIC_MODEL || DEFAULT_ANTHROPIC_MODEL;
+const DEFAULT_ANTHROPIC_MODEL = 'claude-3-5-sonnet-20241022';
+const anthropicModel =
+  process.env.ANTHROPIC_MODEL ||
+  process.env.ANTHROPIC_DEFAULT_MODEL ||
+  DEFAULT_ANTHROPIC_MODEL;
 
 export async function POST(request: NextRequest) {
   try {
