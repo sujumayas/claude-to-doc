@@ -56,3 +56,48 @@ export interface MapGeneratorState {
   isGenerating: boolean;
   generatedMaps: GeneratedMap[];
 }
+
+// Puzzle Generator Types
+export type PuzzleGenre = 'fantasy' | 'horror' | 'scifi';
+export type PuzzleCategory =
+  | 'logic'
+  | 'pattern'
+  | 'riddle'
+  | 'sequence'
+  | 'environmental'
+  | 'cipher'
+  | 'mechanism';
+export type PuzzleDifficulty = 'easy' | 'medium' | 'hard';
+
+export interface PuzzleImage {
+  id: string;
+  imageBase64: string;
+  caption: string;
+}
+
+export interface GeneratedPuzzle {
+  id: string;
+  genre: PuzzleGenre;
+  category: PuzzleCategory;
+  difficulty: PuzzleDifficulty;
+  prompt: string;
+  title: string;
+  description: string;
+  setupInstructions: string;
+  hints: string[];
+  solution: string;
+  narrativeHooks: string;
+  dmNotes: string;
+  fullMarkdown: string;
+  images: PuzzleImage[];
+  createdAt: Date;
+}
+
+export interface PuzzleGeneratorState {
+  selectedGenre: PuzzleGenre;
+  selectedCategory: PuzzleCategory;
+  selectedDifficulty: PuzzleDifficulty;
+  prompt: string;
+  isGenerating: boolean;
+  generatedPuzzles: GeneratedPuzzle[];
+}
