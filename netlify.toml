@@ -14,3 +14,10 @@
   node_bundler = "esbuild"
   # Don't include all node_modules - esbuild will bundle only what's needed
   # This prevents the 250MB+ bundle size issue
+
+# Extend timeout for AI generation functions (max 26s on Pro, 10s on free)
+# Note: For longer operations, the API uses streaming to avoid timeouts
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    X-Netlify-Enable-Long-Streaming = "true"
