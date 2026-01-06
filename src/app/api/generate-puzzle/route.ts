@@ -1,4 +1,5 @@
 import Anthropic, { APIError } from '@anthropic-ai/sdk';
+import type { TextBlock } from '@anthropic-ai/sdk/resources/messages/messages';
 import { NextRequest, NextResponse } from 'next/server';
 import { getPuzzleSystemPrompt } from '@/lib/puzzle-system-prompt';
 import { PuzzleGenre, PuzzleCategory, PuzzleDifficulty } from '@/types';
@@ -71,8 +72,7 @@ export async function POST(request: NextRequest) {
       });
 
       const textContent = response.content.find(
-        (content): content is { type: 'text'; text: string } =>
-          content.type === 'text'
+        (content): content is TextBlock => content.type === 'text'
       );
 
       if (!textContent) {
